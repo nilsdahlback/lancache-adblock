@@ -1,5 +1,4 @@
 from threading import Thread, Event
-from datetime import datetime, timedelta
 
 from app.main import app
 from app.cache import Cache
@@ -13,16 +12,16 @@ def cache_thread(e):
     if d.check_db():
         d.insert(c.parse())
     while True:
-        # Check if 24 hours have passed since last update check.
-        if d.check_update() <= datetime.strftime(datetime.now()-timedelta(days=1), '%Y-%m-%d %H:%M:%S.%f'):
-            commit = d.check_commit()
-            if  commit <= c.check_tm(cache_repo):
-                d.insert(c.parse())
-                d.delete(commit)
+        # Since anonymous API calls to Github are rate limited at 60/h we only do 6 to ensure we don't exceed it.
         e.wait(600)
+        # Check for git commit updates to the cache domain json file.
+        if  d.check_update() < c.check_tm(CONFIG['repo']):
+            d.insert(c.parse())
+            # Remove older unused parses to reduce database size.
+            d.clean()
 
 if __name__ == '__main__':
     e = Event()
     thread = Thread(target=cache_thread, args=(e,), daemon=True)
     thread.start()
-    app.run(debug=False)
+    app.run(debug=True)

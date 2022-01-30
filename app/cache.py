@@ -1,6 +1,4 @@
-
 import requests
-from datetime import datetime
 import json
 import re
 
@@ -19,11 +17,12 @@ class Cache:
             d = requests.get(url=self.url + i['domain_files'][0]).text.splitlines()
             for n in d:
                 if(re.search(self.pattern, n)):
-                    l.append(tuple((s, n, datetime.now(), self._tm)))
+                    l.append(tuple((s, n, self._tm)))
         return l
 
     def check_tm(self, repo):
         self.tm = 'https://api.github.com/repos/{}/commits'.format(repo)
+        return self._tm
 
     @property
     def tm(self): return self._tm

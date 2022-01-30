@@ -9,7 +9,7 @@ app = Flask(__name__)
 def index():
     q = request.args
     if not q.get('ip'):
-        return 'You need to set which IP adress you would like to redirect DNS traffic to.<br/>Example: /?service=&lt;service(s)&gt;&<b>ip=&lt;ip&gt;</b>', 200
+        return 'You need to set which IP adress you would like to redirect DNS traffic to.<br/>Example: /?ip=<b>&lt;ip&gt;</b>', 200
 
     d = Database(db=CONFIG['db'], table=CONFIG['table'])
     r = "\n".join(d.retrieve(q.get('ip')))
