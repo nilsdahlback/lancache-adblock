@@ -10,7 +10,7 @@ app = Flask(__name__)
 def index():
     q = request.args
     if not q.get('ip'):
-        return 'Set IP redirect DNS.<br/>Ex: /?ip=<b>&lt;ip&gt;</b>', 200
+        return 'Set IP to redirect DNS.<br/>Ex: /?ip=<b>&lt;ip&gt;</b>', 200
 
     d = Database(db=CONFIG['db'], table=CONFIG['table'])
     r = "\n".join(d.retrieve(q.get('ip')))
