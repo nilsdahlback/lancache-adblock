@@ -8,6 +8,7 @@ worker_connections = 1000
 timeout = 30
 keepalive = 2
 
+
 def cache_thread(e):
     d = Database(db=CONFIG['db'], table=CONFIG['table'])
     c = Cache(repo=CONFIG['repo'], file=CONFIG['file'])
@@ -15,13 +16,15 @@ def cache_thread(e):
     if d.check_db():
         d.insert(c.parse())
     while True:
-        # Since anonymous API calls to Github are rate limited at 60/h we only do 6 to ensure we don't exceed it.
+        # Since anonymous API calls to Github are rate limited
+        # at 60/h we only do 6 to ensure we don't exceed it.
         e.wait(600)
         # Check for git commit updates to the cache domain json file.
-        if  d.check_update() < c.check_tm(CONFIG['repo']):
+        if d.check_update() < c.check_tm(CONFIG['repo']):
             d.insert(c.parse())
             # Remove older unused parses to reduce database size.
             d.clean()
+
 
 def post_worker_init(worker):
     from threading import Thread, Event
